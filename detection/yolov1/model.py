@@ -78,6 +78,7 @@ class YOLOv1(nn.Module):
         ]
 
         self.model = nn.Sequential(*layers)
+        self.float()
 
     def forward(self, x):
         return torch.reshape(
@@ -85,13 +86,15 @@ class YOLOv1(nn.Module):
             (x.size(dim=0), self.S, self.S, self.depth)
         )
 
-###############################
-#         TESTING             #
-###############################
+
+if __name__ == '__name__':
+    ###############################
+    #         TESTING             #
+    ###############################
 
 
-model = YOLOv1(2, 10, 7)
-x = torch.rand((1, 1, 448, 448))
-pred = model(x)
+    model = YOLOv1(2, 10, 7)
+    x = torch.rand((1, 1, 448, 448))
+    pred = model(x)
 
-print(pred.shape)
+    print(pred.shape)

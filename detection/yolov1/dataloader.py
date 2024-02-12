@@ -32,6 +32,7 @@ class CustomImageDataset(Dataset):
         # Image ---------------------------------------------------
         img_path = os.path.join(self.img_dir, f'{idx}.png')
         image = Image.open(img_path).resize(self.size)
+        #image = np.array(image).astype(np.float32)
         image = self.transf(image)
         
         dW = self.width//7
@@ -120,27 +121,34 @@ class CustomImageDataset(Dataset):
 
             target = target_out
 
-        target = torch.tensor(target)
+        target = torch.tensor(target.astype(np.float32))
 
-        return image, target
+        return image, {
+            'bbox': target[..., 0:4],
+            'class': target[..., 4:15],
+            'one_obj': target[..., 15:16]
+        }
     
 
-dataset = CustomImageDataset(annotations_dir = '/home/pqbas/dl/detection/MNIST-ObjectDetection/data/mnist_detection/test/labels',
-                             img_dir = '/home/pqbas/dl/detection/MNIST-ObjectDetection/data/mnist_detection/test/images',
-                             data_transform = transform,
-                             size=(448,448))
+if __name__ == '__main__':
+    dataset = CustomImageDataset(annotations_dir = '/home/pqbas/dl/detection/MNIST-ObjectDetection/data/mnist_detection/test/labels',
+                                img_dir = '/home/pqbas/dl/detection/MNIST-ObjectDetection/data/mnist_detection/test/images',
+                                data_transform = transform,
+                                size=(448,448))
 
-train_loader = DataLoader(dataset, batch_size=16, shuffle=True)
+    train_loader = DataLoader(dataset, batch_size=16, shuffle=True)
 
 
-####################################################
-#############         Testing         ##############
-####################################################
+    ####################################################
+    #############         Testing         ##############
+    ####################################################
 
-break_n = 10
+    break_n = 1
 
-for idx, (image, bbox) in enumerate(train_loader):
+    for idx, (image, target) in enumerate(train_loader):
 
-    print(bbox.shape)
-    if idx == break_n:
-        break
+        # print(target['bbox'])
+        # print(target['class'])
+        print(target['one_obj'].shape)
+        if idx == break_n:
+            break
