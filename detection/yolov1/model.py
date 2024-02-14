@@ -3,10 +3,11 @@ from torch import nn
 
 
 class YOLOv1(nn.Module):
-    def __init__(self, B, C, S):
+    def __init__(self, S, depth):
         super().__init__()
-        self.depth = B * 5 + C
+        self.depth = depth
         self.S = S
+        self.adaptative = nn.AdaptiveAvgPool2d((1))
 
         layers = [
             # Probe(0, forward=lambda x: print('#' * 5 + ' Start ' + '#' * 5)),
@@ -68,12 +69,15 @@ class YOLOv1(nn.Module):
         # layers.append(Probe('conv6', forward=probe_dist))
 
         layers += [
+            nn.AdaptiveAvgPool2d((1)),
             nn.Flatten(),
-            nn.Linear(S * S * 1024, 4096),                            # Linear 1
+            #nn.Linear(S * S * 1024, 4096),                            # Linear 1
+            nn.Linear(1024, 1024),
             nn.Dropout(),
             nn.LeakyReLU(negative_slope=0.1),
             # Probe('linear1', forward=probe_dist),
-            nn.Linear(4096, S * S * self.depth),                      # Linear 2
+            #nn.Linear(4096, S * S * self.depth),                      # Linear 2
+            nn.Linear(1024, S * S * self.depth)
             # Probe('linear2', forward=probe_dist),
         ]
 
