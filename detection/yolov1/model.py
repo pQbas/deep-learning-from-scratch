@@ -33,7 +33,7 @@ class YOLOv1(nn.Module):
             nn.MaxPool2d(kernel_size=2, stride=2)
         ]
 
-        for i in range(4):                                                          # Conv 4
+        for i in range(1):                                                          # Conv 4
             layers += [
                 nn.Conv2d(512, 256, kernel_size=1),
                 nn.Conv2d(256, 512, kernel_size=3, padding=1),

@@ -9,6 +9,11 @@ import pandas
 from PIL import Image
 
 
+
+import matplotlib.pyplot as plt
+from utils import plot_images
+
+
 transform = Compose([
     transforms.ToTensor(),  # Scales data into [0,1]
     transforms.Lambda(lambda t: (t * 2) - 1)  # Scale between [-1, 1]
@@ -73,10 +78,12 @@ class CustomImageDataset(Dataset):
         cell_j = np.uint8(cy//dH)
 
         cell_position = np.zeros([n_objects, 7, 7, 14])
-        cell_position[np.arange(n_objects), cell_i, cell_j, :] = 1
+        cell_position[np.arange(n_objects), cell_j, cell_i, :] = 1
 
+        
         cell_position_sum = cell_position.sum(axis=0)
-        i_x, i_y = np.where(cell_position_sum[..., 0] > 1)
+        i_y, i_x = np.where(cell_position_sum[..., 0] > 1)
+
 
         k_idx = []
         for ix, iy in zip(i_x, i_y):
@@ -98,6 +105,7 @@ class CustomImageDataset(Dataset):
                     if k == max_index:
                         continue
                     vect_[box, :] = 0
+
 
             target_corrected = target*vect_
             cell_position_corrected = cell_position * vect_[:, None, None, :]
@@ -137,18 +145,22 @@ if __name__ == '__main__':
                                 size=(448,448))
 
     train_loader = DataLoader(dataset, batch_size=16, shuffle=True)
+    device = torch.device('cpu')
 
+    n_break = 0
 
-    ####################################################
-    #############         Testing         ##############
-    ####################################################
+    for idx, data in enumerate(train_loader):
 
-    break_n = 1
+        # get the inputs
+        img, target = data
+        img, target = img.to(device), target['one_obj'].to(device)
 
-    for idx, (image, target) in enumerate(train_loader):
+        target_confidence = target.squeeze()
 
-        # print(target['bbox'])
-        # print(target['class'])
-        print(target['one_obj'].shape)
-        if idx == break_n:
+        img2show = img.detach()[0,...].cpu()
+        target2show = target_confidence.detach()[0,...].cpu()
+
+        plot_images([img2show, target2show], title='awd')
+
+        if idx == n_break:
             break
