@@ -90,6 +90,54 @@ class YOLOv1(nn.Module):
             (x.size(dim=0), self.S, self.S, self.depth)
         )
 
+resnet = [
+    {'type': 'conv', 
+     'input': 1, 'output': 64,'kernel_size': 7,'stride': 2,'padding': 3},
+    {'type': 'maxpool'},
+    {'type': 'residual','input': 64,'output': 128,},
+    {'type': 'residual','input': 128,'output': 256,},
+    {
+        'type': 'residual',
+        'input': 256,'output': 512,
+    },
+    {
+        'type': 'residual',
+        'input': 512,'output': 1000,
+    },
+    {
+        'type':'adaptative',
+        'output': 1
+    },
+    {
+        'type': 'flatt',
+        'dim': 1
+    },
+    {
+        'type':'linear',
+        'input':1000, 'output':7*7*12
+    }
+]
+
+import torch
+from torch import nn
+from utils import model_builder
+
+class YOLOv1_resnet(nn.Module):
+    def __init__(self, depth, S):
+        super().__init__()
+        self.depth = depth
+        self.S = S
+        self.backbone = model_builder(resnet)
+
+
+    def forward(self, x):
+        return torch.reshape(
+            self.backbone.forward(x),
+            (x.size(dim=0), self.S, self.S, self.depth)
+        )
+
+
+
 
 if __name__ == '__name__':
     ###############################
