@@ -1,7 +1,8 @@
 # deep-learning
 
 
-- [ ] Implement the loss function of Yolov1 (see `detection/yolov1/loss_function.ipynb`)
+- [x] Implement the loss function of Yolov1 (see `detection/yolov1/loss_function.ipynb`)
+- [ ] Add classification loss and train Yolov1
 
 
 # what's happening
