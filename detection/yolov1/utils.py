@@ -38,7 +38,9 @@ def plot_images(images_list, title):
     fig, axs = plt.subplots(1, len(images_list), figsize=(20, 5))
     for idx, xt in enumerate(images_list):
         axs[idx].set_title(r'$x_{t}$'.replace("t",f"{idx}"))
-        axs[idx].imshow(tensor2image(xt))
+        
+        if type(xt) == torch.Tensor:
+            axs[idx].imshow(tensor2image(xt))
     fig.tight_layout()
     plt.show()
 
